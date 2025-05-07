@@ -1,37 +1,43 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPage from './components/login/LoginPage';
+import Dashboard from './components/dashboard/Dashboard';
 
-const app = express();
-const PORT = 3000;
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
+  useEffect(() => {
+    // Verifica se o token está presente no localStorage
+    const token = localStorage.getItem('authToken');
+    setIsAuthenticated(!!token);
+  }, []);
 
-// Usuários fictícios para autenticação
-const users = [
-  { username: 'jogador1', password: 'senha123' },
-  { username: 'jogador2', password: 'senha456' },
-];
+  const handleLogin = (token) => {
+    localStorage.setItem('authToken', token);
+    setIsAuthenticated(true);
+  };
 
-// Rota de login
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    setIsAuthenticated(false);
+    window.location.href = '/login';
+  };
 
-  // Verifica se o usuário existe
-  const user = users.find(
-    (u) => u.username === username && u.password === password
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/login"
+          element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />}
+        />
+        <Route
+          path="/dashboard"
+          element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+      </Routes>
+    </BrowserRouter>
   );
+}
 
-  if (user) {
-    res.status(200).json({ username: user.username });
-  } else {
-    res.status(401).json({ error: 'Credenciais inválidas' });
-  }
-});
-
-// Inicia o servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
-});
+export default App;

@@ -1,48 +1,102 @@
-import React from 'react';
-import LoginForm from './LoginForm';
-import ParticleBackground from './ParticleBackground';
-import Logo from '../ui/Logo';
+import React, { useState } from 'react';
+import Input from '../ui/Input';
+import Button from '../ui/Button';
+import Checkbox from '../ui/Checkbox';
 
-const LoginPage: React.FC = () => {
-  const handleLogin = (data: { username: string; password: string; rememberMe: boolean }) => {
-    console.log('Login data:', data);
-    // In a real application, you would handle authentication here
+interface LoginFormProps {
+  onSubmit: (data: { username: string; password: string; rememberMe: boolean }) => void;
+  isLoading: boolean; // Adicionada a prop isLoading
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState<{ username?: string; password?: string }>({});
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validação simples
+    const newErrors: { username?: string; password?: string } = {};
+
+    if (!username.trim()) {
+      newErrors.username = 'O nome de usuário é obrigatório';
+    }
+
+    if (!password) {
+      newErrors.password = 'A senha é obrigatória';
+    } else if (password.length < 6) {
+      newErrors.password = 'A senha deve ter pelo menos 6 caracteres';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Limpa erros anteriores
+    setErrors({});
+    onSubmit({ username, password, rememberMe });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex flex-col items-center justify-center px-4 sm:px-6">
-      <ParticleBackground />
-      
-      {/* Dark overlay with subtle pattern */}
-      <div className="absolute inset-0 bg-black bg-opacity-40 z-0 pointer-events-none" 
-           style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%239C92AC" fill-opacity="0.05" fill-rule="evenodd"%3E%3Ccircle cx="3" cy="3" r="3"/%3E%3Ccircle cx="13" cy="13" r="3"/%3E%3C/g%3E%3C/svg%3E")'}}></div>
-      
-      {/* Main content */}
-      <div className="w-full max-w-md z-10">
-        <div className="flex flex-col items-center mb-8">
-          <Logo size="lg" className="mb-4" />
-          <h1 className="text-xl sm:text-2xl text-center font-medium text-gray-200 mt-4">
-            Begin Your Adventure
-          </h1>
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="space-y-4">
+        <Input
+          label="Nome de Usuário"
+          id="username"
+          name="username"
+          placeholder="Digite seu nome de usuário"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          error={errors.username}
+          fullWidth
+          autoComplete="username"
+        />
+        {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
+
+        <Input
+          label="Senha"
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Digite sua senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={errors.password}
+          fullWidth
+          autoComplete="current-password"
+        />
+        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+
+        <div className="flex items-center justify-between">
+          <Checkbox
+            id="remember-me"
+            name="remember-me"
+            label="Lembrar de mim"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+
+          <a href="#" className="text-sm text-red-400 hover:text-red-300 transition-colors">
+            Esqueceu a senha?
+          </a>
         </div>
-        
-        {/* Login card */}
-        <div className="w-full bg-gray-900 bg-opacity-80 backdrop-blur-sm p-6 sm:p-8 rounded-lg shadow-2xl border border-gray-800 transform transition-all">
-          <LoginForm onSubmit={handleLogin} />
-        </div>
-        
-        {/* Footer */}
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>© 2025 ShadowRealm RPG. All rights reserved.</p>
-          <div className="mt-2 space-x-4">
-            <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">Terms</a>
-            <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">Privacy</a>
-            <a href="#" className="text-gray-400 hover:text-red-400 transition-colors">Support</a>
-          </div>
-        </div>
+
+        <Button
+          type="submit"
+          variant="primary"
+          isLoading={isLoading}
+          fullWidth
+          className="mt-6 py-3 text-lg font-bold tracking-wide"
+          disabled={isLoading} // Desativa o botão enquanto está carregando
+        >
+          {isLoading ? 'Carregando...' : 'ENTRAR'}
+        </Button>
       </div>
-    </div>
+    </form>
   );
 };
 
-export default LoginPage;
+export default LoginForm;
