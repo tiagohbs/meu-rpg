@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Life of Blood - Login</title>
+  <style>
+    body {
+      background: linear-gradient(#1e1e2f, #2c2c3e);
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      color: #e63946;
+    }
+
+    form {
+      background-color: #333;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    input {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button {
+      background-color: #e63946;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background-color: #c0303a;
+    }
+  </style>
+</head>
+<body>
+  <h1>One Life of Blood</h1>
+  <form onsubmit="login(event)">
+    <input type="text" id="username" placeholder="Nome do jogador" required />
+    <input type="password" id="password" placeholder="Senha" required />
+    <button type="submit">Entrar</button>
+  </form>
+
+  <script>
+    async function login(event) {
+      event.preventDefault();
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+
+      try {
+        // Simulação de chamada a uma API de autenticação
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: user, password: pass }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          alert(`Bem-vindo(a), ${data.username}!`);
+          window.location.href = 'dashboard.html'; // Redirecione para a página principal
+        } else {
+          alert('Credenciais inválidas. Tente novamente.');
+        }
+      } catch (error) {
+        console.error('Erro ao fazer login:', error);
+        alert('Erro ao conectar ao servidor.');
+      }
+    }
+  </script>
+</body>
+</html>
