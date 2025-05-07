@@ -42,14 +42,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Página de login */}
         <Route
           path="/login"
           element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />}
         />
+        {/* Página do dashboard */}
         <Route
           path="/dashboard"
           element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />}
         />
+        {/* Redirecionamento inicial */}
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>
     </BrowserRouter>
