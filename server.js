@@ -5,7 +5,7 @@ import pool from './db.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -55,7 +55,7 @@ app.post('/api/login', async (req, res) => {
 
     const user = result.rows[0];
 
-    const isValid = await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compareSync(password, user.password);
 
     if (!isValid) {
       return res.status(401).send('Senha incorreta');
@@ -88,7 +88,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     // Criptografa a senha
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hashSync(password, 10);
 
     // Insere o novo usuário
     const result = await pool.query(
