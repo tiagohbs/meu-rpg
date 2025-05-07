@@ -5,12 +5,17 @@ import Dashboard from './components/dashboard/Dashboard';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // novo estado
+  const [loading, setLoading] = useState(true);
+
+  const clearAuthToken = () => {
+    localStorage.removeItem('authToken');
+    sessionStorage.removeItem('authToken');
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     if (token) {
-      fetch('/api/verify-token', {
+      fetch('https://meu-rpg-6pnn.onrender.com/api/verify-token', {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -18,19 +23,21 @@ function App() {
           if (response.ok) {
             setIsAuthenticated(true);
           } else {
-            localStorage.removeItem('authToken');
-            sessionStorage.removeItem('authToken');
+            clearAuthToken();
             setIsAuthenticated(false);
           }
         })
         .catch(() => {
-          localStorage.removeItem('authToken');
-          sessionStorage.removeItem('authToken');
+          clearAuthToken();
           setIsAuthenticated(false);
+        })
+        .finally(() => {
+          setLoading(false);
         });
+    } else {
+      setLoading(false);
     }
   }, []);
-  
 
   const handleLogin = (token: string, rememberMe: boolean) => {
     if (rememberMe) {
@@ -42,12 +49,12 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
+    clearAuthToken();
     setIsAuthenticated(false);
     window.location.href = '/login';
   };
 
-  if (loading) return <div>Carregando...</div>; // exibe algo enquanto carrega
+  if (loading) return <div>Carregando...</div>;
 
   return (
     <BrowserRouter>
@@ -65,3 +72,5 @@ function App() {
     </BrowserRouter>
   );
 }
+
+export default App;
