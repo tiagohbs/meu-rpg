@@ -5,14 +5,13 @@ interface LoginPageProps {
   onLogin: (token: string, rememberMe: boolean) => void;
 }
 
-
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (data: { username: string; password: string; rememberMe: boolean }) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('https://meu-rpg-6pnn.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -21,7 +20,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       if (response.ok) {
         const result = await response.json();
         onLogin(result.token, data.rememberMe);
-
       } else {
         alert('Credenciais inválidas.');
       }
