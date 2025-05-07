@@ -5,7 +5,7 @@ import Checkbox from '../ui/Checkbox';
 
 interface LoginFormProps {
   onSubmit: (data: { username: string; password: string; rememberMe: boolean }) => void;
-  isLoading: boolean;
+  isLoading: boolean; // Adicionada a prop isLoading
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
@@ -90,7 +90,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, isLoading }) => {
           isLoading={isLoading}
           fullWidth
           className="mt-6 py-3 text-lg font-bold tracking-wide"
-          disabled={isLoading}
+          disabled={isLoading} // Desativa o botão enquanto está carregando
         >
           {isLoading ? 'Carregando...' : 'ENTRAR'}
         </Button>
