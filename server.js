@@ -17,13 +17,24 @@ const PORT = 5000;
 app.use(cors());
 app.use(bodyParser.json());
 
+// Rota para testar a conexão com o banco de dados
+app.get('/api/test-connection', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.status(200).json({ message: 'Conexão bem-sucedida', timestamp: result.rows[0].now });
+  } catch (error) {
+    console.error('Erro ao conectar ao banco de dados:', error.message);
+    res.status(500).json({ message: 'Erro ao conectar ao banco de dados', error: error.message });
+  }
+});
+
 // Rota para buscar usuários
 app.get('/api/users', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM users');
     res.json(result.rows);
   } catch (error) {
-    console.error('Erro ao buscar usuários:', error);
+    console.error('Erro ao buscar usuários:', error.message);
     res.status(500).send('Erro ao buscar usuários');
   }
 });
@@ -56,7 +67,7 @@ app.post('/api/login', async (req, res) => {
 
     res.json({ token });
   } catch (error) {
-    console.error('Erro ao fazer login:', error);
+    console.error('Erro ao fazer login:', error.message);
     res.status(500).send('Erro interno ao fazer login');
   }
 });
@@ -88,11 +99,10 @@ app.post('/api/register', async (req, res) => {
     const newUser = result.rows[0];
     res.status(201).json({ message: 'Usuário registrado com sucesso', user: newUser });
   } catch (error) {
-    console.error('Erro ao registrar usuário:', error);
+    console.error('Erro ao registrar usuário:', error.message);
     res.status(500).send('Erro ao registrar usuário');
   }
 });
-
 
 // Rota para verificar token JWT
 app.get('/api/verify-token', (req, res) => {
@@ -108,8 +118,15 @@ app.get('/api/verify-token', (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     return res.status(200).json({ valid: true, user: decoded });
   } catch (error) {
+    console.error('Erro ao verificar token:', error.message);
     return res.status(401).json({ message: 'Token inválido' });
   }
+});
+
+// Middleware para tratamento de erros
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Erro interno no servidor' });
 });
 
 // Iniciar o servidor
