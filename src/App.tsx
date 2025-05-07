@@ -5,9 +5,10 @@ import Dashboard from './components/dashboard/Dashboard';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true); // novo estado
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     if (token) {
       fetch('/api/verify-token', {
         method: 'GET',
@@ -18,18 +19,25 @@ function App() {
             setIsAuthenticated(true);
           } else {
             localStorage.removeItem('authToken');
+            sessionStorage.removeItem('authToken');
             setIsAuthenticated(false);
           }
         })
         .catch(() => {
           localStorage.removeItem('authToken');
+          sessionStorage.removeItem('authToken');
           setIsAuthenticated(false);
         });
     }
   }, []);
+  
 
-  const handleLogin = (token: string) => {
-    localStorage.setItem('authToken', token);
+  const handleLogin = (token: string, rememberMe: boolean) => {
+    if (rememberMe) {
+      localStorage.setItem('authToken', token);
+    } else {
+      sessionStorage.setItem('authToken', token);
+    }
     setIsAuthenticated(true);
   };
 
@@ -39,24 +47,21 @@ function App() {
     window.location.href = '/login';
   };
 
+  if (loading) return <div>Carregando...</div>; // exibe algo enquanto carrega
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* Página de login */}
         <Route
           path="/login"
           element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />}
         />
-        {/* Página do dashboard */}
         <Route
           path="/dashboard"
           element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />}
         />
-        {/* Redirecionamento inicial */}
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
-export default App;

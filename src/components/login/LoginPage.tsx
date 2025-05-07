@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import LoginForm from './LoginForm';
 
 interface LoginPageProps {
-  onLogin: (token: string) => void;
+  onLogin: (token: string, rememberMe: boolean) => void;
 }
+
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +20,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
       if (response.ok) {
         const result = await response.json();
-        onLogin(result.token); // Passa o token para o App
+        onLogin(result.token, data.rememberMe);
+
       } else {
         alert('Credenciais inválidas.');
       }

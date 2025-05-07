@@ -61,6 +61,24 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Rota para verificar token JWT
+app.get('/api/verify-token', (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: 'Token não fornecido' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return res.status(200).json({ valid: true, user: decoded });
+  } catch (error) {
+    return res.status(401).json({ message: 'Token inválido' });
+  }
+});
+
 // Iniciar o servidor
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
