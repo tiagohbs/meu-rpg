@@ -61,6 +61,39 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// Rota de registro
+app.post('/api/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Verifica se o usuário já existe
+    const existingUser = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).send('Usuário já existe');
+    }
+
+    // Criptografa a senha
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insere o novo usuário
+    const result = await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username',
+      [username, hashedPassword]
+    );
+
+    const newUser = result.rows[0];
+    res.status(201).json({ message: 'Usuário registrado com sucesso', user: newUser });
+  } catch (error) {
+    console.error('Erro ao registrar usuário:', error);
+    res.status(500).send('Erro ao registrar usuário');
+  }
+});
+
+
 // Rota para verificar token JWT
 app.get('/api/verify-token', (req, res) => {
   const authHeader = req.headers.authorization;
