@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-black text-white font-sans;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-wider;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  input, textarea, select, button {
+    @apply font-sans;
+  }
+}
+
+@layer components {
+  .btn-glow:hover {
+    @apply shadow-glow;
+  }
+}
+
+/* Custom animated background */
+@keyframes moveGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-bg {
+  background: linear-gradient(45deg, #000000, #1a0000, #000000);
+  background-size: 400% 400%;
+  animation: moveGradient 15s ease infinite;
+}
