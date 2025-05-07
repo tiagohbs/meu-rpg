@@ -59,6 +59,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Define a tela de login como a rota inicial */}
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route
           path="/login"
           element={!isAuthenticated ? <LoginPage onLogin={handleLogin} /> : <Navigate to="/dashboard" />}
@@ -67,7 +69,6 @@ function App() {
           path="/dashboard"
           element={isAuthenticated ? <Dashboard onLogout={handleLogout} /> : <Navigate to="/login" />}
         />
-        <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
       </Routes>
     </BrowserRouter>
   );
